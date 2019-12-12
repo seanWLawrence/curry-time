@@ -17,7 +17,8 @@ export let pipe = (...fns) => fns.reduce((a, b) => arg => b(a(arg)));
 export let ifElse = (predicate, ifResult, elseResult) => value =>
   predicate(value) ? ifResult(value) : elseResult(value);
 export let or = predicate => value => value || predicate(value);
-export let and = predicate => value => value && predicate(value);
+export let and = predicate => value =>
+  value && predicate(value) ? true : false;
 export let call = fn => value => fn.call(this, value);
 
 // Arrays
