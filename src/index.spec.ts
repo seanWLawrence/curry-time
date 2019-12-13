@@ -12,7 +12,6 @@ import {
   reduce,
   filter,
   join,
-  split,
   length,
   some,
   every,
@@ -44,7 +43,11 @@ import {
   isUndefined,
   isObject,
   isFalsy,
-  isTruthy
+  isTruthy,
+  prefix,
+  suffix,
+  split,
+  caseOf
 } from "./";
 
 describe("identity", () => {
@@ -516,15 +519,6 @@ describe("lte", () => {
   });
 });
 
-describe("split", () => {
-  it("splits a string into an array for each occurence of the splitter", () => {
-    let str = "hello, world!";
-
-    expect(split).toBeDefined();
-    expect(split(",")(str)).toEqual(["hello", " world!"]);
-  });
-});
-
 describe("not", () => {
   it("returns the opposite of the value based on truthiness", () => {
     expect(not(false)).toBe(true);
@@ -692,5 +686,61 @@ describe("isFalsy", () => {
     expect(isFalsy([])).toBe(false);
     expect(isFalsy(() => {})).toBe(false);
     expect(isFalsy(1)).toBe(false);
+  });
+});
+
+describe("prefix", () => {
+  it("adds a prefix to the string", () => {
+    expect(prefix("yo")("dude")).toBe("yodude");
+  });
+});
+
+describe("suffix", () => {
+  it("adds a suffix to the string", () => {
+    expect(suffix("yo")("dude")).toBe("dudeyo");
+  });
+});
+
+describe("split", () => {
+  it("splits a string into an array for each occurence of the splitter", () => {
+    let str = "hello, world!";
+
+    expect(split).toBeDefined();
+    expect(split(",")(str)).toEqual(["hello", " world!"]);
+  });
+});
+
+describe("caseOf", () => {
+  it("calls the function if the value matches a key in the cases object", () => {
+    let mockHello = jest.fn(() => "hello");
+    let mockWorld = jest.fn(() => "world");
+
+    expect(caseOf({ hello: mockHello, world: mockWorld })("hello")).toBe(
+      "hello"
+    );
+    expect(caseOf({ hello: mockHello, world: mockWorld })("world")).toBe(
+      "world"
+    );
+    expect(mockHello).toHaveReturnedTimes(1);
+    expect(mockWorld).toHaveReturnedTimes(1);
+    expect(mockHello).toHaveBeenLastCalledWith("hello");
+    expect(mockWorld).toHaveBeenLastCalledWith("world");
+  });
+
+  it("runs the default function if the value does not match a key in the cases object and a default key in the cases object is specified", () => {
+    let mockDefault = jest.fn(() => "default");
+
+    expect(caseOf({ hello2: noop, default: mockDefault })("hello")).toBe(
+      "default"
+    );
+    expect(mockDefault).toHaveReturnedTimes(1);
+    expect(mockDefault).toHaveBeenLastCalledWith("hello");
+  });
+
+  it("does nothing if the value does not match a key in the cases object and there is no default key", () => {
+    let mockHello = jest.fn(() => "hello");
+
+    expect(caseOf({ hello2: mockHello })("hello")).toBeUndefined();
+    expect(mockHello).toHaveBeenCalledTimes(0);
   });
 });

@@ -110,7 +110,19 @@ export let split = splitter => value => value.split(splitter);
 // Extra (moved down here since it uses functions declared above
 
 export let caseOf = cases => value => {
-  let matchingCase = pipe(entries, find(pipe(head, equals(value))), tail, head);
+  let matchingCase = pipe(
+    entries,
+    find(pipe(head, equals(value))),
+    ifElse(
+      isUndefined,
+      ifElse(
+        pipe(() => keys(cases), includes("default")),
+        () => cases["default"],
+        () => noop
+      ),
+      pipe(tail, head)
+    )
+  );
 
   return matchingCase(cases)(value);
 };
