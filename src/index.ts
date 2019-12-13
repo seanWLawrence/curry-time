@@ -11,15 +11,15 @@ export let trace = value => {
 
 // Control flow
 export let noop = () => {};
+export let wrap = value => () => value;
 export let maybe = value => Maybe.fromNullable(value);
 export let maybeAsync = asyncFn => MaybeAsync(asyncFn);
 export let pipe = (...fns) => fns.reduce((a, b) => arg => b(a(arg)));
 export let ifElse = (predicate, ifResult, elseResult) => value =>
   predicate(value) ? ifResult(value) : elseResult(value);
-export let or = predicate => value => value || predicate(value);
-export let and = predicate => value =>
-  value && predicate(value) ? true : false;
 export let call = fn => value => fn.call(this, value);
+export let all = (...fns) => value => every(fn => fn(value))(fns);
+export let any = (...fns) => value => some(fn => fn(value))(fns);
 
 // Arrays
 export let map = predicate => value => value.map(predicate);
@@ -31,8 +31,8 @@ export let reduce = (predicate, defaultValue = void 0) => value =>
 export let length = value => value.length;
 export let some = predicate => value => value.some(predicate);
 export let every = predicate => value => value.every(predicate);
-export let none = predicate => value =>
-  !value.every(predicate) && !value.some(predicate);
+export let none = predicate =>
+  all(pipe(every(predicate), not), pipe(some(predicate), not));
 export let includes = includer => value => value.includes(includer);
 export let find = predicate => value => value.find(predicate);
 export let head = value => value[0];
@@ -47,13 +47,13 @@ export let values = value => Object.values(value);
 export let pluck = (...keys) =>
   pipe(
     entries,
-    filter(([key, value]) => keys.includes(key)),
+    filter(pipe(head, key => keys.includes(key))),
     map(tail),
     flatten,
     ifElse(
       pipe(length, equals(1)),
       head,
-      ifElse(pipe(length, equals(0)), () => void 0, identity)
+      ifElse(pipe(length, equals(0)), stubUndefined, identity)
     )
   );
 
@@ -71,12 +71,18 @@ export let lte = comparison => value => value <= comparison;
 
 // Booleans
 export let not = value => !value;
-export let stubTrue = () => true;
-export let stubFalse = () => false;
-export let stubNull = () => null;
+export let stubTrue = wrap(true);
+export let stubFalse = wrap(false);
+export let stubNull = wrap(null);
+export let stubUndefined = wrap(void 0);
+
 export let equals = comparison => value => value === comparison;
-export let getType = value =>
-  Array.isArray(value) ? "array" : equals(value)(null) ? "null" : typeof value;
+
+export let getType = ifElse(
+  Array.isArray,
+  wrap("array"),
+  ifElse(equals(null), wrap("null"), v => typeof v)
+);
 
 export let isType = comparison => value =>
   equals(comparison)("array")
@@ -94,9 +100,9 @@ export let isTruthy = ifElse(
   isString,
   pipe(length, gt(0)),
   ifElse(
-    v => isObject(v) || isArray(v) || isFunction(v),
+    any(isObject, isArray, isFunction),
     stubTrue,
-    ifElse(v => isNumber(v) && gt(0)(v), stubTrue, stubFalse)
+    ifElse(all(isNumber, gt(0)), stubTrue, stubFalse)
   )
 );
 
@@ -116,9 +122,9 @@ export let caseOf = cases => value => {
     ifElse(
       isUndefined,
       ifElse(
-        pipe(() => keys(cases), includes("default")),
-        () => cases["default"],
-        () => noop
+        pipe(wrap(keys(cases)), includes("default")),
+        wrap(cases["default"]),
+        wrap(noop)
       ),
       pipe(tail, head)
     )

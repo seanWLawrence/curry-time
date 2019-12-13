@@ -4,9 +4,9 @@ import {
   noop,
   pipe,
   ifElse,
-  or,
-  and,
   call,
+  all,
+  any,
   map,
   forEach,
   reduce,
@@ -148,40 +148,6 @@ describe("ifElse", () => {
   });
 });
 
-describe("or", () => {
-  it("returns the value without checking the predicate if truthy", () => {
-    expect(or(() => false)(true)).toBe(true);
-    expect(or(() => 1)("hello")).toBe("hello");
-    expect(or(() => "")({})).toEqual({});
-  });
-
-  it("returns the value of the predicate if the value is falsy", () => {
-    expect(or(() => true)(false)).toBe(true);
-    expect(or(() => 1)("")).toBe(1);
-    expect(or(() => "")(null)).toBe("");
-  });
-});
-
-describe("and", () => {
-  it("returns true if the value and predicate are truthy", () => {
-    expect(and(() => "hello")(true)).toBe(true);
-    expect(and(() => 1)("hello")).toBe(true);
-    expect(and(() => [])({})).toBe(true);
-  });
-
-  it("returns false if the value is falsy", () => {
-    expect(and(() => "hello")(false)).toBe(false);
-    expect(and(() => 1)("")).toBe(false);
-    expect(and(() => [])(0)).toBe(false);
-  });
-
-  it("returns false if the value is truthy and the predicate is falsy", () => {
-    expect(and(() => false)({})).toBe(false);
-    expect(and(() => 0)("hello")).toBe(false);
-    expect(and(() => "")(true)).toBe(false);
-  });
-});
-
 describe("call", () => {
   it("calls a function with the value", () => {
     let mock = jest.fn();
@@ -316,13 +282,15 @@ describe("none", () => {
   it("returns true if every item in an array returns a falsy value from the predicate", () => {
     let arr = ["hello", "world"];
 
-    expect(none(w => length(w) !== 5)(arr)).toBe(true);
+    expect(none(equals("hello2"))(arr)).toBe(true);
+    expect(none(gt(5))([1, 2, 3])).toBe(true);
   });
 
   it("returns false if at least one item in an array returns a truthy value from the predicate", () => {
     let arr = ["hello", "world"];
 
     expect(none(w => w === "hello")(arr)).toBe(false);
+    expect(none(gt(5))([1, 2, 3, 6])).toBe(false);
   });
 });
 
