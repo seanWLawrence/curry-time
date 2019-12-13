@@ -27,7 +27,11 @@ import {
   keys,
   values,
   pluck,
-  get
+  get,
+  gt,
+  lt,
+  gte,
+  lte
 } from "./";
 
 describe("identity", () => {
@@ -449,10 +453,61 @@ describe("get", () => {
   });
 });
 
+describe("gt", () => {
+  it("returns true if value is greater than the comparison", () => {
+    expect(gt(5)(10)).toBe(true);
+    expect(gt(10)(20)).toBe(true);
+  });
+
+  it("returns false if value is less than the comparison", () => {
+    expect(gt(10)(5)).toBe(false);
+    expect(gt(20)(10)).toBe(false);
+  });
+});
+
+describe("lt", () => {
+  it("returns true if value is less than the comparison", () => {
+    expect(lt(10)(5)).toBe(true);
+    expect(lt(20)(10)).toBe(true);
+  });
+
+  it("returns false if value is greater than the comparison", () => {
+    expect(lt(5)(10)).toBe(false);
+    expect(lt(10)(20)).toBe(false);
+  });
+});
+
+describe("gte", () => {
+  it("returns true if value is greater or equal to the comparison", () => {
+    expect(gt(5)(10)).toBe(true);
+    expect(gt(10)(20)).toBe(true);
+    expect(gte(20)(20)).toBe(true);
+  });
+
+  it("returns false if value is less than the comparison", () => {
+    expect(gte(10)(5)).toBe(false);
+    expect(gte(20)(10)).toBe(false);
+  });
+});
+
+describe("lte", () => {
+  it("returns true if value is less or equal to the comparison", () => {
+    expect(lte(10)(5)).toBe(true);
+    expect(lte(20)(10)).toBe(true);
+    expect(lte(20)(20)).toBe(true);
+  });
+
+  it("returns false if value is greater than the comparison", () => {
+    expect(lte(5)(10)).toBe(false);
+    expect(lte(10)(20)).toBe(false);
+  });
+});
+
 describe("split", () => {
   it("splits a string into an array for each occurence of the splitter", () => {
     let str = "hello, world!";
 
+    expect(split).toBeDefined();
     expect(split(",")(str)).toEqual(["hello", " world!"]);
   });
 });
