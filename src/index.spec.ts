@@ -9,8 +9,10 @@ import {
   call,
   map,
   forEach,
+  reduce,
   filter,
   join,
+  split,
   length,
   some,
   every,
@@ -19,7 +21,13 @@ import {
   head,
   tail,
   at,
-  find
+  flatten,
+  find,
+  entries,
+  keys,
+  values,
+  pluck,
+  get
 } from "./";
 
 describe("identity", () => {
@@ -208,6 +216,15 @@ describe("forEach", () => {
   });
 });
 
+describe("reduce", () => {
+  it("calls a predicate on each item and returns a new accumaltive array", () => {
+    let mock = jest.fn((acc, next) => next);
+    let arr = [1, 2, 3];
+
+    expect(reduce((acc, next) => acc + next)(arr)).toEqual(6);
+  });
+});
+
 describe("filter", () => {
   it("calls a predicate on each item and returns a new array with items that returned a truthy value", () => {
     let mock = jest.fn(identity);
@@ -341,5 +358,101 @@ describe("at", () => {
 
     expect(at(0)(arr)).toBe("hello");
     expect(at(1)(arr)).toEqual(["world"]);
+  });
+});
+
+describe("flatten", () => {
+  it("returns a flattened array by one level", () => {
+    let arr = ["hello", ["world"]];
+    let arr2 = ["hello", [["world"]]];
+
+    expect(flatten(arr)).toEqual(["hello", "world"]);
+    expect(flatten(arr2)).toEqual(["hello", ["world"]]);
+  });
+});
+describe("entries", () => {
+  it("returns an array of key/value pairs for an object", () => {
+    let obj = { hello: "world", hola: "mundo" };
+
+    expect(entries(obj)).toEqual([
+      ["hello", "world"],
+      ["hola", "mundo"]
+    ]);
+  });
+});
+
+describe("keys", () => {
+  it("returns an array of keys for an object", () => {
+    let obj = { hello: "world", hola: "mundo" };
+
+    expect(keys(obj)).toEqual(["hello", "hola"]);
+  });
+});
+
+describe("values", () => {
+  it("returns an array of values for an object", () => {
+    let obj = { hello: "world", hola: "mundo" };
+
+    expect(values(obj)).toEqual(["world", "mundo"]);
+  });
+});
+
+describe("pluck", () => {
+  it("returns a value if the key is found in an object", () => {
+    let obj = { hello: "world", hola: "mundo" };
+
+    expect(pluck("hello")(obj)).toEqual("world");
+  });
+
+  it("returns an array of values if multiple keys are passed and found in an object", () => {
+    let obj = { hello: "world", hola: "mundo" };
+
+    expect(pluck("hello", "hola")(obj)).toEqual(["world", "mundo"]);
+  });
+
+  it("returns undefined is key is not found in an object", () => {
+    let obj = { hello: "world", hola: "mundo" };
+
+    expect(pluck("hello2")(obj)).toBeUndefined();
+  });
+
+  it("returns undefined is multiple keys are not found in an object", () => {
+    let obj = { hello: "world", hola: "mundo" };
+
+    expect(pluck("hello2", "hola2")(obj)).toBeUndefined();
+  });
+});
+
+describe("get", () => {
+  it("returns a value if the path is found in an object", () => {
+    let obj = { hello: "world", hola: "mundo" };
+
+    expect(get("hello")(obj)).toEqual("world");
+  });
+
+  it("returns value if the path is found in an object, even if a default value is passed", () => {
+    let obj = { hello: "world", hola: "mundo" };
+
+    expect(get("hello", "default")(obj)).toBe("world");
+  });
+
+  it("returns undefined is key is not found in an object", () => {
+    let obj = { hello: "world", hola: "mundo" };
+
+    expect(get("hello2")(obj)).toBeUndefined();
+  });
+
+  it("returns defaultValue if specified and key is not found in an object", () => {
+    let obj = { hello: "world", hola: "mundo" };
+
+    expect(get("hello2", "default")(obj)).toBe("default");
+  });
+});
+
+describe("split", () => {
+  it("splits a string into an array for each occurence of the splitter", () => {
+    let str = "hello, world!";
+
+    expect(split(",")(str)).toEqual(["hello", " world!"]);
   });
 });
