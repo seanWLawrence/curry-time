@@ -1,6 +1,10 @@
 import { Maybe } from "purify-ts/Maybe";
 import { MaybeAsync } from "purify-ts/MaybeAsync";
+import { Either } from "purify-ts/Either";
+import { EitherAsync } from "purify-ts/EitherAsync";
 import { List } from "purify-ts/List";
+
+export { Maybe, MaybeAsync, Either, EitherAsync, List };
 
 // Utilities
 export let identity = value => value;
