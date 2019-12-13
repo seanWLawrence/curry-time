@@ -31,7 +31,20 @@ import {
   gt,
   lt,
   gte,
-  lte
+  lte,
+  not,
+  equals,
+  getType,
+  isType,
+  isString,
+  isNumber,
+  isFunction,
+  isArray,
+  isNull,
+  isUndefined,
+  isObject,
+  isFalsy,
+  isTruthy
 } from "./";
 
 describe("identity", () => {
@@ -509,5 +522,175 @@ describe("split", () => {
 
     expect(split).toBeDefined();
     expect(split(",")(str)).toEqual(["hello", " world!"]);
+  });
+});
+
+describe("not", () => {
+  it("returns the opposite of the value based on truthiness", () => {
+    expect(not(false)).toBe(true);
+    expect(not("")).toBe(true);
+    expect(not(0)).toBe(true);
+
+    expect(not(true)).toBe(false);
+    expect(not({})).toBe(false);
+    expect(not("hello")).toBe(false);
+    expect(not([])).toBe(false);
+  });
+});
+
+describe("equals", () => {
+  it("returns true if both the value and comparison equal with ===", () => {
+    expect(equals(false)(false)).toBe(true);
+    expect(equals("hello")("hello")).toBe(true);
+    expect(equals(0)(0)).toBe(true);
+  });
+
+  it("returns false if both the value and comparison do not equal with ===", () => {
+    expect(equals(false)(true)).toBe(false);
+    expect(equals("hello")("hellos")).toBe(false);
+    expect(equals(0)(1)).toBe(false);
+  });
+});
+
+describe("getType", () => {
+  it("returns typeof value or 'array' if Array.isArray or 'null' if null", () => {
+    expect(getType([])).toBe("array");
+    expect(getType({})).toBe("object");
+    expect(getType(() => {})).toBe("function");
+    expect(getType("hello")).toBe("string");
+    expect(getType(1)).toBe("number");
+    expect(getType(false)).toBe("boolean");
+    expect(getType(null)).toBe("null");
+    expect(getType(void 0)).toBe("undefined");
+  });
+});
+
+describe("isType", () => {
+  it("returns true if the value from getType equals the comparison", () => {
+    expect(isType("array")([])).toBe(true);
+    expect(isType("null")(null)).toBe(true);
+    expect(isType("object")({})).toBe(true);
+    expect(isType("string")("hello")).toBe(true);
+    expect(isType("number")(0)).toBe(true);
+    expect(isType("undefined")(void 0)).toBe(true);
+    expect(isType("boolean")(false)).toBe(true);
+  });
+
+  it("returns false if the value from getType does not equal the comparison", () => {
+    expect(isType("array")({})).toBe(false);
+    expect(isType("null")(void 0)).toBe(false);
+    expect(isType("object")([])).toBe(false);
+    expect(isType("string")(void 0)).toBe(false);
+    expect(isType("number")(null)).toBe(false);
+    expect(isType("undefined")("hello")).toBe(false);
+    expect(isType("boolean")(0)).toBe(false);
+  });
+});
+
+describe("isString", () => {
+  it("returns true if the value is a string type", () => {
+    expect(isString("hello")).toBe(true);
+  });
+
+  it("returns false if the value is not a string type", () => {
+    expect(isString({})).toBe(false);
+  });
+});
+
+describe("isNumber", () => {
+  it("returns true if the value is a number type", () => {
+    expect(isNumber(0)).toBe(true);
+  });
+
+  it("returns false if the value is not a number type", () => {
+    expect(isNumber("number")).toBe(false);
+  });
+});
+
+describe("isFunction", () => {
+  it("returns true if the value is a function type", () => {
+    expect(isFunction(() => {})).toBe(true);
+  });
+
+  it("returns false if the value is not a function type", () => {
+    expect(isFunction({})).toBe(false);
+  });
+});
+describe("isArray", () => {
+  it("returns true if the value is an array type", () => {
+    expect(isArray([])).toBe(true);
+  });
+
+  it("returns false if the value is not an array type", () => {
+    expect(isArray({})).toBe(false);
+  });
+});
+
+describe("isNull", () => {
+  it("returns true if the value is an null type", () => {
+    expect(isNull(null)).toBe(true);
+  });
+
+  it("returns false if the value is not an null type", () => {
+    expect(isNull(void 0)).toBe(false);
+  });
+});
+
+describe("isUndefined", () => {
+  it("returns true if the value is an undefined type", () => {
+    expect(isUndefined(void 0)).toBe(true);
+  });
+
+  it("returns false if the value is not an undefined type", () => {
+    expect(isUndefined(null)).toBe(false);
+  });
+});
+
+describe("isObject", () => {
+  it("returns true if the value is an object type", () => {
+    expect(isObject({})).toBe(true);
+  });
+
+  it("returns false if the value is not an object type", () => {
+    expect(isObject([])).toBe(false);
+    expect(isObject(null)).toBe(false);
+  });
+});
+
+describe("isTruthy", () => {
+  it("returns true if the value is truthy", () => {
+    expect(isTruthy({})).toBe(true);
+    expect(isTruthy("hello")).toBe(true);
+    expect(isTruthy([])).toBe(true);
+    expect(isTruthy(() => {})).toBe(true);
+    expect(isTruthy(1)).toBe(true);
+  });
+
+  it("returns false if the value is falsy", () => {
+    expect(isTruthy("")).toBe(false);
+    expect(isTruthy(null)).toBe(false);
+    expect(isTruthy(0)).toBe(false);
+    expect(isTruthy(-1)).toBe(false);
+    expect(isTruthy(void 0)).toBe(false);
+    expect(isTruthy(NaN)).toBe(false);
+  });
+});
+
+describe("isFalsy", () => {
+  it("returns true if the value is falsy", () => {
+    expect(isFalsy("")).toBe(true);
+    expect(isFalsy(null)).toBe(true);
+    expect(isFalsy(0)).toBe(true);
+    expect(isFalsy(-1)).toBe(true);
+    expect(isFalsy(void 0)).toBe(true);
+    expect(isFalsy(NaN)).toBe(true);
+  });
+
+  it("returns false if the value is truthy", () => {
+    expect(isFalsy({})).toBe(false);
+    expect(isFalsy("hello")).toBe(false);
+    expect(isFalsy([])).toBe(false);
+    expect(isFalsy(() => {})).toBe(false);
+    expect(isFalsy(1)).toBe(false);
   });
 });

@@ -71,38 +71,36 @@ export let lte = comparison => value => value <= comparison;
 
 // Booleans
 export let not = value => !value;
+export let stubTrue = () => true;
+export let stubFalse = () => false;
+export let stubNull = () => null;
 export let equals = comparison => value => value === comparison;
-export let isType = value => typeof value;
-export let isString = pipe(isType, equals("string"));
-export let isNumber = pipe(isType, equals("number"));
-export let isFunction = pipe(isType, equals("function"));
-export let isArray = value => Array.isArray(value);
-export let isNull = equals(null);
-export let isUndefined = equals(void 0);
-export let isObject = pipe(isType("object"), and, pipe(isArray, not));
-export let isFalsy = pipe(
-  isNull,
-  or,
-  isUndefined,
-  or,
-  lt(1),
-  or,
-  equals(""),
-  or,
-  isNaN
+export let getType = value =>
+  Array.isArray(value) ? "array" : equals(value)(null) ? "null" : typeof value;
+
+export let isType = comparison => value =>
+  equals(comparison)("array")
+    ? Array.isArray(value)
+    : equals(getType(value))(comparison);
+
+export let isString = isType("string");
+export let isNumber = isType("number");
+export let isFunction = isType("function");
+export let isArray = isType("array");
+export let isNull = isType("null");
+export let isUndefined = isType("undefined");
+export let isObject = isType("object");
+export let isTruthy = ifElse(
+  isString,
+  pipe(length, gt(0)),
+  ifElse(
+    v => isObject(v) || isArray(v) || isFunction(v),
+    stubTrue,
+    ifElse(v => isNumber(v) && gt(0)(v), stubTrue, stubFalse)
+  )
 );
 
-export let isTruthy = pipe(
-  isNull,
-  or,
-  isUndefined,
-  or,
-  lt(1),
-  or,
-  equals(""),
-  or,
-  isNaN
-);
+export let isFalsy = pipe(isTruthy, not);
 
 // Strings
 export let prefix = prefixer => value => `${prefixer}${value}`;
