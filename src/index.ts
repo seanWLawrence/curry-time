@@ -29,12 +29,13 @@ export let join = joiner => value => value.join(joiner);
 export let length = value => value.length;
 export let some = predicate => value => value.some(predicate);
 export let every = predicate => value => value.every(predicate);
-export let none = predicate => value => !value.every(predicate);
+export let none = predicate => value =>
+  !value.every(predicate) && !value.some(predicate);
 export let includes = includer => value => value.includes(includer);
+export let find = predicate => value => value.find(predicate);
 export let head = value => value[0];
 export let tail = value => value.slice(1);
 export let at = index => value => value[index];
-export let find = predicate => value => value.find(predicate);
 
 // Objects
 export let entries = value => Object.entries(value);

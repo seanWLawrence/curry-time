@@ -1,4 +1,26 @@
-import { identity, trace, noop, pipe, ifElse, or, and } from "./";
+import {
+  identity,
+  trace,
+  noop,
+  pipe,
+  ifElse,
+  or,
+  and,
+  call,
+  map,
+  forEach,
+  filter,
+  join,
+  length,
+  some,
+  every,
+  none,
+  includes,
+  head,
+  tail,
+  at,
+  find
+} from "./";
 
 describe("identity", () => {
   it("returns the value passed in", () => {
@@ -129,5 +151,195 @@ describe("and", () => {
     expect(and(() => false)({})).toBe(false);
     expect(and(() => 0)("hello")).toBe(false);
     expect(and(() => "")(true)).toBe(false);
+  });
+});
+
+describe("call", () => {
+  it("calls a function with the value", () => {
+    let mock = jest.fn();
+
+    expect(call(mock)("some value")).toBeUndefined();
+    expect(mock).toHaveBeenCalledTimes(1);
+    expect(mock).toHaveBeenCalledWith("some value");
+  });
+});
+
+describe("map", () => {
+  it("calls a predicate on each item and returns a new array", () => {
+    let mock = jest.fn(identity);
+    let arr = [1, 2, 3];
+
+    expect(map(mock)(arr)).toEqual(arr);
+    expect(mock).toHaveBeenCalledTimes(arr.length);
+    expect(mock).toHaveBeenNthCalledWith(1, arr[0], 0, arr);
+    expect(mock).toHaveBeenNthCalledWith(2, arr[1], 1, arr);
+    expect(mock).toHaveBeenNthCalledWith(3, arr[2], 2, arr);
+
+    let mock2 = jest.fn(v => v + 1);
+    let mock2Result = [2, 3, 4];
+
+    expect(map(mock2)(arr)).toEqual(mock2Result);
+    expect(mock2).toHaveBeenCalledTimes(arr.length);
+    expect(mock2).toHaveBeenNthCalledWith(1, arr[0], 0, arr);
+    expect(mock2).toHaveBeenNthCalledWith(2, arr[1], 1, arr);
+    expect(mock2).toHaveBeenNthCalledWith(3, arr[2], 2, arr);
+  });
+});
+
+describe("forEach", () => {
+  it("calls a predicate on each item", () => {
+    let mock = jest.fn(identity);
+    let arr = [1, 2, 3];
+
+    expect(forEach(mock)(arr)).toBeUndefined();
+    expect(mock).toHaveBeenCalledTimes(arr.length);
+    expect(mock).toHaveBeenNthCalledWith(1, arr[0], 0, arr);
+    expect(mock).toHaveBeenNthCalledWith(2, arr[1], 1, arr);
+    expect(mock).toHaveBeenNthCalledWith(3, arr[2], 2, arr);
+
+    let mock2 = jest.fn(v => v + 1);
+    let mock2Result = [2, 3, 4];
+
+    expect(forEach(mock2)(arr)).toBeUndefined();
+    expect(mock2).toHaveBeenCalledTimes(arr.length);
+    expect(mock2).toHaveBeenNthCalledWith(1, arr[0], 0, arr);
+    expect(mock2).toHaveBeenNthCalledWith(2, arr[1], 1, arr);
+    expect(mock2).toHaveBeenNthCalledWith(3, arr[2], 2, arr);
+  });
+});
+
+describe("filter", () => {
+  it("calls a predicate on each item and returns a new array with items that returned a truthy value", () => {
+    let mock = jest.fn(identity);
+    let arr = [1, 2, 3];
+
+    expect(filter(mock)(arr)).toEqual(arr);
+    expect(mock).toHaveBeenCalledTimes(arr.length);
+    expect(mock).toHaveBeenNthCalledWith(1, arr[0], 0, arr);
+    expect(mock).toHaveBeenNthCalledWith(2, arr[1], 1, arr);
+    expect(mock).toHaveBeenNthCalledWith(3, arr[2], 2, arr);
+
+    let mock2 = jest.fn(v => v - 1);
+    let mock2Result = [2, 3];
+
+    expect(filter(mock2)(arr)).toEqual(mock2Result);
+    expect(mock2).toHaveBeenCalledTimes(arr.length);
+    expect(mock2).toHaveBeenNthCalledWith(1, arr[0], 0, arr);
+    expect(mock2).toHaveBeenNthCalledWith(2, arr[1], 1, arr);
+    expect(mock2).toHaveBeenNthCalledWith(3, arr[2], 2, arr);
+  });
+});
+
+describe("join", () => {
+  it("joins an array of strings with a joiner", () => {
+    let arr = ["hello", "world"];
+
+    expect(join(":")(arr)).toBe("hello:world");
+    expect(join(", ")(arr)).toBe("hello, world");
+  });
+});
+
+describe("length", () => {
+  it("returns the length of an array", () => {
+    let arr = ["hello", "world"];
+
+    expect(length(arr)).toBe(2);
+  });
+});
+
+describe("some", () => {
+  it("returns true if at least one item in an array returns a truthy value from the predicate", () => {
+    let arr = ["hello", "world"];
+
+    expect(some(w => w === "hello")(arr)).toBe(true);
+  });
+
+  it("returns false if at no items in an array return a truthy value from the predicate", () => {
+    let arr = ["hello", "world"];
+
+    expect(some(w => w === "hello2")(arr)).toBe(false);
+  });
+});
+
+describe("every", () => {
+  it("returns true if every item in an array returns a truthy value from the predicate", () => {
+    let arr = ["hello", "world"];
+
+    expect(every(w => length(w) === 5)(arr)).toBe(true);
+  });
+
+  it("returns false if at least one item in an array return a falsy value from the predicate", () => {
+    let arr = ["hello", "world"];
+
+    expect(every(w => w === "hello")(arr)).toBe(false);
+  });
+});
+
+describe("none", () => {
+  it("returns true if every item in an array returns a falsy value from the predicate", () => {
+    let arr = ["hello", "world"];
+
+    expect(none(w => length(w) !== 5)(arr)).toBe(true);
+  });
+
+  it("returns false if at least one item in an array returns a truthy value from the predicate", () => {
+    let arr = ["hello", "world"];
+
+    expect(none(w => w === "hello")(arr)).toBe(false);
+  });
+});
+
+describe("includes", () => {
+  it("returns true if at least one item in an array matches the value", () => {
+    let arr = ["hello", "world"];
+
+    expect(includes("hello")(arr)).toBe(true);
+  });
+
+  it("returns false if no items in an array match the value", () => {
+    let arr = ["hello", "world"];
+
+    expect(includes("hello2")(arr)).toBe(false);
+  });
+});
+
+describe("find", () => {
+  it("returns the first item in an array that returns a truthy value from the predicate", () => {
+    let arr = ["hello", "world"];
+
+    expect(find(w => length(w) === 5)(arr)).toBe("hello");
+
+    expect(find(w => w === "world")(arr)).toBe("world");
+  });
+
+  it("returns undefined if no items in an array return a truthy value from the predicate", () => {
+    let arr = ["hello", "world"];
+
+    expect(find(w => w === "hello2")(arr)).toBeUndefined();
+  });
+});
+
+describe("head", () => {
+  it("returns the first item in an array", () => {
+    let arr = ["hello", "world"];
+
+    expect(head(arr)).toBe("hello");
+  });
+});
+
+describe("tail", () => {
+  it("returns all items in an array except the first", () => {
+    let arr = ["hello", "world", "I", "am", "here"];
+
+    expect(tail(arr)).toEqual(["world", "I", "am", "here"]);
+  });
+});
+
+describe("at", () => {
+  it("returns an item from an array at the index", () => {
+    let arr = ["hello", ["world"]];
+
+    expect(at(0)(arr)).toBe("hello");
+    expect(at(1)(arr)).toEqual(["world"]);
   });
 });
