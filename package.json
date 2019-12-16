@@ -1,12 +1,13 @@
 {
-  "name": "fp",
-  "version": "1.0.0",
-  "main": "index.js",
-  "author": "makeschool <sean.w.lawrence@gmail.com>",
+  "name": "curry-time",
+  "version": "0.0.0-development",
+  "main": "src/index.js",
+  "author": "Sean W. Lawrence <sean.w.lawrence@gmail.com>",
   "license": "MIT",
   "scripts": {
     "watch": "ts-node src/index.ts",
-    "test": "jest"
+    "test": "jest",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "purify-ts": "^0.13.2"
@@ -15,8 +16,14 @@
     "@types/jest": "^24.0.23",
     "@types/node": "^12.12.17",
     "jest": "^24.9.0",
+    "semantic-release-cli": "^5.2.3",
     "ts-jest": "^24.2.0",
     "ts-node": "^8.5.4",
-    "typescript": "^3.7.3"
+    "typescript": "^3.7.3",
+    "semantic-release": "^15.13.31"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seanWLawrence/curry-time.git"
   }
 }

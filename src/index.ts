@@ -18,6 +18,8 @@ export let noop = () => {};
 export let wrap = value => () => value;
 export let maybe = value => Maybe.fromNullable(value);
 export let maybeAsync = asyncFn => MaybeAsync(asyncFn);
+export let either = value => Either.of(value);
+export let eitherAsync = asyncFn => EitherAsync(asyncFn);
 export let pipe = (...fns) => fns.reduce((a, b) => arg => b(a(arg)));
 export let ifElse = (predicate, ifResult, elseResult) => value =>
   predicate(value) ? ifResult(value) : elseResult(value);
