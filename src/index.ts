@@ -31,7 +31,7 @@ export let map = predicate => value => value.map(predicate);
 export let forEach = predicate => value => value.forEach(predicate);
 export let filter = predicate => value => value.filter(predicate);
 export let join = joiner => value => value.join(joiner);
-export let reduce = (predicate, defaultValue = void 0) => value =>
+export let reduce = (predicate, defaultValue: any = void 0) => value =>
   value.reduce(predicate, defaultValue);
 export let length = value => value.length;
 export let some = predicate => value => value.some(predicate);
@@ -62,7 +62,7 @@ export let pluck = (...keys) =>
     )
   );
 
-export let get = (selector, defaultValue = void 0) => value => {
+export let get = (selector, defaultValue: any = void 0) => value => {
   let pathArray = selector.split('.');
 
   return pathArray.reduce((obj, key) => obj && obj[key], value) || defaultValue;

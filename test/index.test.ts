@@ -4,8 +4,6 @@ import {
   noop,
   pipe,
   ifElse,
-  all,
-  any,
   map,
   forEach,
   reduce,
@@ -47,7 +45,7 @@ import {
   suffix,
   split,
   caseOf,
-} from './';
+} from '../src';
 
 describe('identity', () => {
   it('returns the value passed in', () => {
@@ -181,7 +179,6 @@ describe('forEach', () => {
     expect(mock).toHaveBeenNthCalledWith(3, arr[2], 2, arr);
 
     let mock2 = jest.fn(v => v + 1);
-    let mock2Result = [2, 3, 4];
 
     expect(forEach(mock2)(arr)).toBeUndefined();
     expect(mock2).toHaveBeenCalledTimes(arr.length);
@@ -193,10 +190,9 @@ describe('forEach', () => {
 
 describe('reduce', () => {
   it('calls a predicate on each item and returns a new accumaltive array', () => {
-    let mock = jest.fn((acc, next) => next);
     let arr = [1, 2, 3];
 
-    expect(reduce((acc, next) => acc + next)(arr)).toEqual(6);
+    expect(reduce((acc, next) => acc + next, 0)(arr)).toEqual(6);
   });
 });
 
